@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>M3U Listesine Film Ekleme</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+        header {
+            background: #2c3e50;
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+        h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        .description {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        .content {
+            padding: 25px;
+        }
+        .film-selection {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+        .film-card {
+            background: #f9f9f9;
+            border-radius: 10px;
+            overflow: hidden;
+            transition: transform 0.3s;
+            cursor: pointer;
+            border: 2px solid #ddd;
+        }
+        .film-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        .film-card.selected {
+            border-color: #3498db;
+            background: #e8f4fc;
+        }
+        .film-poster {
+            height: 180px;
+            background: #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+        }
+        .film-poster img {
+            max-width: 100%;
+            max-height: 100%;
+            border-radius: 5px;
+        }
+        .film-details {
+            padding: 15px;
+        }
+        .film-title {
+            font-size: 18px;
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+        .film-meta {
+            color: #7f8c8d;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+        .film-synopsis {
+            font-size: 14px;
+            line-height: 1.4;
+            height: 60px;
+            overflow: hidden;
+        }
+        .form-container {
+            background: #f5f7fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        input[type="text"], input[type="url"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        input[type="text"]:focus, input[type="url"]:focus {
+            border-color: #3498db;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+        button {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 14px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            width: 100%;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background: #2980b9;
+        }
+        .result {
+            padding: 20px;
+            background: #2c3e50;
+            border-radius: 10px;
+            color: white;
+            display: none;
+        }
+        .result h3 {
+            margin-bottom: 15px;
+            color: #3498db;
+        }
+        pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            background: #1a2530;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        .instructions {
+            margin-top: 25px;
+            padding: 20px;
+            background: #e8f4fc;
+            border-radius: 10px;
+            border-left: 5px solid #3498db;
+        }
+        .instructions h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+        .instructions ol {
+            padding-left: 20px;
+        }
+        .instructions li {
+            margin-bottom: 10px;
+        }
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+        @media (max-width: 768px) {
+            .film-selection {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>M3U Listesine Film Ekleme Aracı</h1>
+            <p class="description">Filmleri M3U listenize kolayca ekleyin</p>
+        </header>
+        
+        <div class="content">
+            <h2 style="margin-bottom: 20px; color: #2c3e50;">Film Seçin</h2>
+            
+            <div class="film-selection">
+                <div class="film-card" onclick="selectFilm(this, 'minecraft')">
+                    <div class="film-poster">
+                        <img src="https://via.placeholder.com/170x250.png?text=Minecraft+Filmi" alt="Bir Minecraft Filmi poster">
+                    </div>
+                    <div class="film-details">
+                        <h3 class="film-title">Bir Minecraft Filmi (A Minecraft Movie)</h3>
+                        <div class="film-meta">2025 · Animasyon · 1s 45dk</div>
+                        <p class="film-synopsis">
+                            Minecraft evreninde geçen bu animasyon filmde, kahramanlarımız macera dolu bir yolculuğa çıkarak 
+                            kendi hikayelerini yazıyorlar.
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="film-card" onclick="selectFilm(this, 'thunderbolts')">
+                    <div class="film-poster">
+                        <img src="https://via.placeholder.com/170x250.png?text=Thunderbolts" alt="Thunderbolts film poster">
+                    </div>
+                    <div class="film-details">
+                        <h3 class="film-title">Thunderbolts</h3>
+                        <div class="film-meta">2024 · Aksiyon · 2s 10dk</div>
+                        <p class="film-synopsis">
+                            Marvel evreninden süper kötülerden oluşan bir takım, dünyayı kurtarmak için 
+                            bir araya gelir. Ancak geçmişlerinden kurtulmaları o kadar kolay olmayacak.
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="film-card" onclick="selectFilm(this, 'amateur')">
+                    <div class="film-poster">
+                        <img src="https://via.placeholder.com/170x250.png?text=The+Amateur" alt="The Amateur film poster">
+                    </div>
+                    <div class="film-details">
+                        <h3 class="film-title">The Amateur</h3>
+                        <div class="film-meta">2024 · Gerilim · 1s 39dk</div>
+                        <p class="film-synopsis">
+                            The Amateur, eski bir CIA ajanının hayatını kaybeden ailesinin intikamını almak için 
+                            yeteneklerini kullanmasını konu alıyor.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-container">
+                <div class="form-group">
+                    <label for="filmAdi">Film Adı:</label>
+                    <input type="text" id="filmAdi" placeholder="Film adını girin">
+                </div>
+                
+                <div class="form-group">
+                    <label for="filmURL">Film URL'si:</label>
+                    <input type="url" id="filmURL" placeholder="Film URL'sini girin">
+                </div>
+                
+                <div class="form-group">
+                    <label for="logoURL">Logo URL'si (isteğe bağlı):</label>
+                    <input type="url" id="logoURL" placeholder="Örnek: http://orneksunucu.com/logo.png">
+                </div>
+                
+                <div class="form-group">
+                    <label for="grup">Grup (isteğe bağlı):</label>
+                    <input type="text" id="grup" value="Filmler">
+                </div>
+                
+                <button onclick="m3uOlustur()">M3U Satırı Oluştur</button>
+            </div>
+            
+            <div id="sonuc" class="result">
+                <h3>Oluşturulan M3U Satırı:</h3>
+                <p>Aşağıdaki satırı mevcut M3U listenize ekleyin:</p>
+                <pre id="m3uCikti"></pre>
+            </div>
+            
+            <div class="instructions">
+                <h3>Nasıl Kullanılır:</h3>
+                <ol>
+                    <li>Eklemek istediğiniz filmi yukarıdan seçin (veya bilgileri manuel girin)</li>
+                    <li>Gerekli alanları kontrol edin/düzenleyin</li>
+                    <li>"M3U Satırı Oluştur" butonuna tıklayın</li>
+                    <li>Oluşturulan M3U formatındaki satırı kopyalayın</li>
+                    <li>M3U listenizi bir metin düzenleyiciyle açın</li>
+                    <li>Kopyaladığınız satırı listenin sonuna ekleyin ve dosyayı kaydedin</li>
+                </ol>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Bu araç sadece M3U formatında çıktı üretir, film içeriği sağlamaz.</p>
+        </footer>
+    </div>
+
+    <script>
+        let selectedFilm = null;
+        
+        function selectFilm(card, filmType) {
+            // Tüm kartlardan seçilmiş sınıfını kaldır
+            document.querySelectorAll('.film-card').forEach(c => {
+                c.classList.remove('selected');
+            });
+            
+            // Seçilen karta sınıf ekle
+            card.classList.add('selected');
+            selectedFilm = filmType;
+            
+            // Form alanlarını doldur
+            if (filmType === 'minecraft') {
+                document.getElementById('filmAdi').value = 'Bir Minecraft Filmi (A Minecraft Movie) (2025)';
+                document.getElementById('filmURL').value = 'https://www.fullhdfilmizlesene.tv/film/bir-minecraft-filmi-a-minecraft-movie/';
+                document.getElementById('grup').value = 'Filmler';
+            } else if (filmType === 'thunderbolts') {
+                document.getElementById('filmAdi').value = 'Thunderbolts (2024)';
+                document.getElementById('filmURL').value = 'https://www.fullhdfilmizlesene.tv/film/thunderbolts-2/';
+                document.getElementById('grup').value = 'Filmler';
+            } else if (filmType === 'amateur') {
+                document.getElementById('filmAdi').value = 'The Amateur (2024)';
+                document.getElementById('filmURL').value = 'https://www.fullhdfilmizlesene.tv/film/the-amateur/';
+                document.getElementById('grup').value = 'Filmler';
+            }
+        }
+        
+        function m3uOlustur() {
+            // Form değerlerini al
+            const filmAdi = document.getElementById('filmAdi').value;
+            const filmURL = document.getElementById('filmURL').value;
+            const logoURL = document.getElementById('logoURL').value;
+            const grup = document.getElementById('grup').value;
+            
+            // Doğrulama
+            if (!filmAdi || !filmURL) {
+                alert('Lütfen en azından Film Adı ve Film URL\'si alanlarını doldurun.');
+                return;
+            }
+            
+            // M3U formatında satır oluştur
+            let m3uSatiri = `#EXTINF:-1 tvg-id="" tvg-name="${filmAdi}" tvg-logo="${logoURL}" group-title="${grup}",${filmAdi}\n`;
+            m3uSatiri += `${filmURL}`;
+            
+            // Sonucu göster
+            document.getElementById('m3uCikti').textContent = m3uSatiri;
+            document.getElementById('sonuc').style.display = 'block';
+            
+            // Sonuca doğru kaydır
+            document.getElementById('sonuc').scrollIntoView({ behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
